@@ -4,14 +4,18 @@ using System.Collections.Concurrent;
 
 namespace YetAnotherKanbanAPI.Models
 {
-    public class TaskBoardRepository : ITaskBoardRepository
+    public class TaskList
     {
+        public string Id {get; set; }
+        public string Name {get; set; }
+        public IEnumerable<TaskCard> cards { get; set; }
+
         private static ConcurrentDictionary<string, TaskCard> _cards =
               new ConcurrentDictionary<string, TaskCard>();
 
-        public TaskBoardRepository()
+        public TaskList()
         {
-            Add(new TaskCard { Name = "Item1" });
+            Add(new TaskCard { Title = "Item1" });
         }
 
         public IEnumerable<TaskCard> GetAll()
@@ -21,8 +25,8 @@ namespace YetAnotherKanbanAPI.Models
 
         public void Add(TaskCard item)
         {
-            item.Key = Guid.NewGuid().ToString();
-            _cards[item.Key] = item;
+            item.Id = Guid.NewGuid().ToString();
+            _cards[item.Id] = item;
         }
 
         public TaskCard Find(string key)
@@ -41,7 +45,7 @@ namespace YetAnotherKanbanAPI.Models
 
         public void Update(TaskCard item)
         {
-            _cards[item.Key] = item;
+            _cards[item.Id] = item;
         }
     }
 }

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace YetAnotherKanbanAPI.Models
 {
-  public interface ITaskBoardRepository
+  public interface ITaskList
   {
     void Add(TaskCard card);
     IEnumerable<TaskCard> GetAll();
