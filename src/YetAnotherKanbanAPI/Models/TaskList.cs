@@ -24,10 +24,11 @@ namespace YetAnotherKanbanAPI.Models
             return _cards.Values;
         }
 
-        public void Add(TaskCard item)
+        public TaskCard Add(TaskCard item)
         {
             item.Id = shortUid.generate();
             _cards[item.Id] = item;
+            return item;
         }
 
         public TaskCard Find(string key)
@@ -37,11 +38,11 @@ namespace YetAnotherKanbanAPI.Models
             return item;
         }
 
-        public TaskCard Remove(string key)
+        public bool Remove(string key)
         {
             TaskCard item;
             _cards.TryRemove(key, out item);
-            return item;
+            return item != null;
         }
 
         public void Update(TaskCard item)

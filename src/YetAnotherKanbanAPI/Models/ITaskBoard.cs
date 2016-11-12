@@ -4,10 +4,10 @@ namespace YetAnotherKanbanAPI.Models
 {
   public interface ITaskBoard
   {
-    void Add(TaskList list);
+    TaskList Add(TaskList list);
     IEnumerable<TaskList> GetAll();
     TaskList Find(string key);
-    TaskList Remove(string key);
+    bool Remove(string key);
     void Update(TaskList item);
   }
 }
