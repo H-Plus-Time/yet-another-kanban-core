@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
+using YetAnotherKanbanAPI.Utils;
+using Newtonsoft.Json;
 
 namespace YetAnotherKanbanAPI.Models
 {
@@ -8,14 +10,13 @@ namespace YetAnotherKanbanAPI.Models
     {
         public string Id {get; set; }
         public string Name {get; set; }
-        public IEnumerable<TaskList> lists { get; set; }
 
-        private static ConcurrentDictionary<string, TaskList> _lists =
-              new ConcurrentDictionary<string, TaskList>();
+        [JsonProperty()]
+        private static ConcurrentDictionary<string, TaskList> _lists { get; set; }
 
         public TaskBoard()
         {
-            Add(new TaskList { Id = Guid.NewGuid().ToString(), Name = "List1" , cards = new TaskCard[] {}});
+          _lists = new ConcurrentDictionary<string, TaskList>();
         }
 
         public IEnumerable<TaskList> GetAll()
@@ -25,7 +26,7 @@ namespace YetAnotherKanbanAPI.Models
 
         public void Add(TaskList item)
         {
-            item.Id = Guid.NewGuid().ToString();
+            item.Id = shortUid.generate();
             _lists[item.Id] = item;
         }
 
@@ -46,6 +47,9 @@ namespace YetAnotherKanbanAPI.Models
         public void Update(TaskList item)
         {
             _lists[item.Id] = item;
+        }
+        public override string ToString() {
+          return $"Name = {this.Name}, Id = {this.Id}";
         }
     }
 }

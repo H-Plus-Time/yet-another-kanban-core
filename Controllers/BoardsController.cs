@@ -4,31 +4,15 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using YetAnotherKanbanAPI.Models;
+using YetAnotherKanbanAPI.Utils;
+using Newtonsoft.Json;
 
 namespace YetAnotherKanbanAPI.Controllers
 {
     [Route("api/[controller]")]
     public class BoardsController : Controller
     {
-        TaskBoard[] boards = new TaskBoard[]
-        {
-          new TaskBoard { Id = Guid.NewGuid().ToString(), Name = "PRJ_3010", lists = new TaskList[] {
-                new TaskList { Id = Guid.NewGuid().ToString(), Name = "To Do", cards = new TaskCard[] {
-                    new TaskCard { Id = Guid.NewGuid().ToString(), Title = "lorem", Content = "Ipsum"}
-                  }
-                },
-                new TaskList { Id = Guid.NewGuid().ToString(), Name = "Doing", cards = new TaskCard[] {
-                    new TaskCard {Id = Guid.NewGuid().ToString(), Title = "lorem", Content = "ipsum"}
-                  }
-                }
-            }
-          },
-          new TaskBoard { Id = Guid.NewGuid().ToString(), Name = "COSC3020", lists = new TaskList[] {
-              new TaskList { Id = Guid.NewGuid().ToString(), Name = "To Do", cards = new TaskCard[] {} }
-            }
-          }
-        };
-
+        static List<TaskBoard> boards = new List<TaskBoard>();
         // GET api/values
         [HttpGet]
         public IEnumerable<TaskBoard> Get()
@@ -36,38 +20,61 @@ namespace YetAnotherKanbanAPI.Controllers
             return boards;
         }
 
-        // GET api/boards/PRJ_3010
+        // GET api/boards/longuid
         [HttpGet("{id}")]
-        public JsonResult Get(string id)
+        public TaskBoard Get(string id)
         {
             var board = boards.FirstOrDefault((b) => b.Id == id);
-            return board != null ? Json(board) : Json("");
+            return board;
         }
 
         // POST api/boards
         [HttpPost]
         public string Post([FromBody]string value)
         {
-          Console.WriteLine("printing entries");
-          Console.WriteLine(value);
-          Console.WriteLine("printed body");
           return value;
         }
 
         // PUT api/boards
-        [HttpPut("{boardId}/{listId}")]
-        public TaskCard Put(string boardId, string listId, [FromBody]TaskCard value)
+        [HttpPut]
+        public void Put([FromBody]TaskBoard newBoard)
         {
-          Console.WriteLine(boards.FirstOrDefault((b) => b.Id == boardId));
-          Console.WriteLine(value);
-          return value;
-
+          newBoard.Id = shortUid.generate();
+          boards.Add(newBoard);
+        }
+        // PUT api/boards/longuid
+        [HttpPut("{boardId}")]
+        public void Put(string boardId, [FromBody]TaskList newList)
+        {
+          boards.Find((b) => b.Id == boardId)?.Add(newList);
         }
 
-        // DELETE api/boards/5
-        [HttpDelete("{id}")]
-        public void Delete(string id)
+        // PUT api/boards/longuid/otherlonguid
+        [HttpPut("{boardId}/{listId}")]
+        public void Put(string boardId, string listId, [FromBody]TaskCard newCard)
         {
+          newCard.Id = shortUid.generate();
+          boards.Find((b) => b.Id == boardId)?.Find(listId).Add(newCard);
+        }
+
+        [HttpGet("{boardId}/{listId}")]
+        public TaskList Get(string boardId, string listId)
+        {
+          return boards.Find((b) => b.Id == boardId)?.Find(listId);
+        }
+
+        // DELETE api/boards/longuid
+        [HttpDelete("{boardId}")]
+        public void Delete(string boardId)
+        {
+          boards.Remove(boards.Find((b) => b.Id == boardId));
+        }
+
+        // DELETE api/boards/longuid/otherlonguid
+        [HttpDelete("{boardId}/{listId}")]
+        public void Delete(string boardId, string listId)
+        {
+          boards.FirstOrDefault((b) => b.Id == boardId)?.Remove(listId);
         }
     }
 }
